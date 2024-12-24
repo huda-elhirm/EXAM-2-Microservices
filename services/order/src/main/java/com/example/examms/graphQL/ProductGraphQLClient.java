@@ -19,7 +19,7 @@ public class ProductGraphQLClient {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8081/graphql").build(); // URL du microservice Product
     }
 
-    public PurchaseResponse getProductById(String productId) {
+    public PurchaseResponse getProductById(Integer productId) {
         String query = """
             query {
                 getProductById(id: "%s") {

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.example.examms.graphQL.ProductGraphQLClient;
+import com.example.examms.product.PurchaseRequest;
 import com.example.examms.product.PurchaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/orders")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class OrderController {
 
   /*private final OrderService service;
@@ -51,12 +52,17 @@ public class OrderController {
 
   @PostMapping
   public ResponseEntity<String> createOrder(@RequestBody OrderRequest orderRequest) {
-    PurchaseResponse product = productClient.getProductById(String.valueOf(orderRequest.id()));
-    if ( BigDecimal.valueOf(product.quantity()).compareTo(orderRequest.amount())) {
-      return ResponseEntity.badRequest().body("Stock insuffisant pour le produit : " + product.name());
+    for (PurchaseRequest purchaseRequest : orderRequest.products()) {
+      // Récupérer les détails du produit via GraphQL
+      PurchaseResponse product = productClient.getProductById(purchaseRequest.productId());
+
+      // Vérifier la disponibilité du stock
+      if (product.quantity() < purchaseRequest.quantity()) {
+        return ResponseEntity.badRequest().body("Stock insuffisant pour le produit : " + product.name());
+      }
     }
 
-    // Logique pour sauvegarder la commande
-    return ResponseEntity.ok("Commande créée pour le produit : " + product.name());
+    // Logique pour sauvegarder la commande...
+    return ResponseEntity.ok("Commande créée avec succès !");
   }
 }
